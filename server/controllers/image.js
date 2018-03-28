@@ -26,11 +26,14 @@ module.exports = {
     })
   },
   editPhoto: function (req, res) {
+    let token = req.headers.token
+    let decoded = jwt.verify(token, process.env.SECRET)
     Image.updateOne({
-      _id: req.body.id
+      userId: decoded.id,
+      _id: req.params.id
     },{
       $set: {
-        caption : req.body.caption
+        caption : req.headers.caption
       }
     }).then(data => {
       res.status(200).json({
@@ -40,11 +43,17 @@ module.exports = {
     })
   },
   deletePhoto: function (req, res) {
+    let token = req.headers.token
+    let decoded = jwt.verify(token, process.env.SECRET)
+    console.log(decoded);
     Image.remove({
-      _id: req.body.id
+      userId: decoded.id,
+      _id: req.params.id
     }).then(data => {
-      message: 'success delete data',
-      data
+      res.status(200).json({
+        message: 'success delete data',
+        data
+      })
     })
   }
 }
