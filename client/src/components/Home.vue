@@ -8,10 +8,13 @@
         <button type="button" class="btn btn-outline-danger btn-lg" data-toggle="modal" data-target="#exampleModalCenter">+</button>
       </div>
       <div class="col-md-7">
-        <div class="card col-md 7">
-          <img class="card-img-top" height="490" width="15" src="../assets/logo.png" alt="Card image cap">
+        <div class="card col-md 7" v-for="(data, i) in foto.slice().reverse()" v-bind:key="data">
+          <img class="card-img-top" height="490" width="15" :src="data.photo" alt="Card image cap">
           <div class="card-body">
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <p class="card-text">{{data.caption}}</p>
+            <blockquote class="blockquote mb-0">
+              <footer class="blockquote-footer">Uploaded by: <cite title="Source Title">{{data.userId.name}}</cite></footer>
+            </blockquote>
           </div>
         </div>
       </div>
@@ -57,8 +60,13 @@ export default {
       name: localStorage.getItem('name'),
       token: localStorage.getItem('token'),
       caption: '',
-      file: null
+      file: null,
+      formData: new FormData(),
+      foto: []
     }
+  },
+  created: function () {
+    this.getPhoto()
   },
   methods: {
     ambilFoto: function (event) {
@@ -67,18 +75,27 @@ export default {
     },
     addPhoto: function () {
       console.log(this.caption)
+      this.formData.set('item', this.file)
+      this.formData.set('caption', this.caption)
       axios({
         method: 'post',
-        url: 'http://localhost:3000/api/photo',
+        url: 'http://localhost:3000/api/upload',
         headers: {
           token: this.token
         },
-        data: {
-          caption: this.caption,
-          item: this.file[0]
-        }
+        data: this.formData
       }).then(({ data }) => {
         console.log(data)
+        this.getPhoto()
+      })
+    },
+    getPhoto: function () {
+      axios({
+        method: 'get',
+        url: 'http://localhost:3000/api'
+      }).then(({ data }) => {
+        console.log(data)
+        this.foto = data.data
       })
     }
   }
@@ -86,4 +103,7 @@ export default {
 </script>
 
 <style lang="css">
+.card {
+  margin-bottom: 28px;
+}
 </style>

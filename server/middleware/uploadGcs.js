@@ -37,15 +37,17 @@ function sendUploadToGCS (req, res, next) {
   });
   // handle when upload error
   stream.on('error', (err) => {
+    console.log(err);
     req.file.cloudStorageError = err;
     next(err);
   });
 
   // handle when upload finish
   stream.on('finish', () => {
+    console.log('masuk sini');
     req.file.cloudStorageObject = gcsname;
-    file.makePublic(). //make the uploaded file public
-      then(() => {
+    file.makePublic() //make the uploaded file public
+      .then(() => {
         console.log('masuk sini')
         req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
         next();
